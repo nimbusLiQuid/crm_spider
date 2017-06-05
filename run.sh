@@ -72,3 +72,5 @@ rm -f ${URL_DIR}/urls_to_spider_${DELETE}*.txt
 rm -f ${CONTENT_DIR}/urls_content_${DELETE}*.txt
 rm -f ${LOG_DIR}/update_${DELETE}*.log
 rm -f ${LOG_DIR}/missing_${DELETE}*.log
+echo "-------------------------------------------------------------------------------------"
+echo "Finish All Task."
