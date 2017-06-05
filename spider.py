@@ -50,11 +50,11 @@ sudo pip install urllib3[secure]
 # 配置如下
 
 # 进程数: 推荐与CPU数相同
-PROCESS_NUM = 8
+PROCESS_NUM = 4
 # 线程数: 推荐20左右
 thread_count = 20
 # timeout 设置，5秒
-time_out = 5
+time_out = 7
 # -------------------------------
 current_path = os.path.split(os.path.realpath(__file__))[0] + '/'
 ua_list = []
@@ -289,18 +289,9 @@ if __name__ == '__main__':
     # 构建多进程队列
     url_queue = Queue()
     # 向队列中插入文件内的url，补全https或者http
-
-    bad_pattern_set = set()
-    with open('bad.txt') as f:
-        for line in f:
-            line = line.strip()
-            bad_pattern_set.add(line)
-
     with open(sys.argv[1]) as f:
         for line in f:
             line = line.strip()
-            if line in bad_pattern_set:
-                continue
             if not line.startswith('http://') and not line.startswith('https://'):
                 if is_https_site(line):
                     line = 'https://' + line

@@ -8,6 +8,10 @@ import time
 import types
 import re
 from jieba import analyse
+from url_utility import *
+import redis
+
+bad_url_redis = redis.Redis(port=2019, db=2)
 
 # Connect to the database
 
@@ -102,7 +106,7 @@ def add_records(attr_dict_list):
 
 
 yun_db_urls_set = set()
-for d in run('select urls from crm_order_result where telecom_update_time > 1495123200  and tags is null'):
+for d in run('select urls from crm_order_result where telecom_update_time > 1495814400 and tags is null'):
     assert 'urls' in d
     for url in d['urls'].split('|'):
         if '(' in url or ')' in url:
@@ -116,8 +120,8 @@ for d in run('select urls from crm_order_result where telecom_update_time > 1495
         yun_db_urls_set.add(url)
 
 all_url_set = set()
-for d in lrun('select url from crm_website'):
-    all_url_set.add(d['url'])
+for d in lrun('select distinct url from crm_website'):
+    all_url_set.add(d['url'].lower())
 
 NOW = int(time.time())
 pattern_d = []
@@ -128,7 +132,6 @@ python3 yun_db.py > urls_to_spider_${TIMESTAMP}.txt
 python spider.py urls_to_spider_${TIMESTAMP}.txt > urls_content_${TIMESTAMP}.txt
 """
 
-url_re_pattern = re.compile(r'^(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?$')
 for filename in glob.glob('urls_content/urls_content_*.txt'):
     with open(filename, errors='ignore') as f:
         for line in f:
@@ -140,8 +143,10 @@ for filename in glob.glob('urls_content/urls_content_*.txt'):
 
             url = url.lstrip('http://')
             url = url.lstrip('https://')
+            url = url.lower()
 
-            if not url_re_pattern.search(url):
+            if not is_html_content_valid(body):
+                bad_url_redis[url] = 1
                 continue
 
             if url in all_url_set:
@@ -153,7 +158,6 @@ for filename in glob.glob('urls_content/urls_content_*.txt'):
                 parts.append('')
 
             title, keywords, description, plist, alist = parts[0], parts[1], parts[2], parts[3], parts[4]
-
             m_dict = {
                 'url': url,
                 'timestamp': NOW,
@@ -190,5 +194,4 @@ connection.commit()
 local_connection.commit()
 
 for i in yun_db_urls_set - all_url_set:
-    if url_re_pattern.search(i):
-        print(i)
+    print(i)
