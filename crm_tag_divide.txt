@@ -1,0 +1,13 @@
+====== 加盟行业标签细分 ======
+
+编辑这个页面
+
+指定tag_id， order_id和关键词列表（用英文逗号隔开）则tag_id = 3中的数据将被细分，并自动导入。
+
+<code javascript>
+// 样例
+// {"tag_id": 106, "order_id": 870, "keywords": "猪排,火鸡,大象肉"}
+
+  //{"tag_id": 104, "order_id": 861, "keywords": "鸡排,冰淇淋"}
+
+</code>
