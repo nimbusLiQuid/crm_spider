@@ -125,7 +125,8 @@ monkey_patch()
 
 
 gbk_table = {
-    "m.hc360.com": ''
+    "m.hc360.com": '',
+    ".5588.tv": ''
 }
 
 def detect_code_via_html(url_p):

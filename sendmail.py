@@ -14,12 +14,12 @@ SMTP_SERVER     = "smtp.ym.163.com"
 SMTP_PORT       = 25
 
 SMTP_USERNAME   = "linquan@baicdata.com"
-SMTP_PASSWORD   = "65b-aWk-Dpn-MaB"
+SMTP_PASSWORD   = os.environ.get('SMTP_PASSWORD')
 
 MAILTO_LIST     = [
-                  "linquan@baicdata.com",
-                  "heshuai@baicdata.com",
-                  "donglingyu@baicdata.com"
+                  "林泉<linquan@baicdata.com>",
+                  "何帅<heshuai@baicdata.com>",
+                  "董灵瑜<donglingyu@baicdata.com>"
                   ]
 # MAILTO_LIST = ['linquan@baicdata.com']
 MAIL_FROM       = "林泉的自动报表<linquan@baicdata.com>"
@@ -36,7 +36,7 @@ def sendmail(from_, to_list, subject, content):
     msg = MIMEText(content, _subtype="html", _charset="utf-8")
     msg["Subject"] = subject
     msg["From"] = from_
-    msg["To"] = ";".join(to_list)
+    msg["To"] = ",".join(to_list)
     try:
         smtp = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         smtp.login(SMTP_USERNAME, SMTP_PASSWORD)

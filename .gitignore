@@ -2,3 +2,7 @@
 *.bak
 __pycache__
 *.py[c|o]
+isolate/
+temp_junk/
+urls_content/
+urls_to_spider/

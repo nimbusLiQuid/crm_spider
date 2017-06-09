@@ -10,8 +10,9 @@ import re
 from jieba import analyse
 from url_utility import *
 import redis
+import os
 
-bad_url_redis = redis.Redis(port=2019, db=2)
+bad_url_redis = redis.Redis(port= os.environ.get('REDIS_PORT') or 6019, db=2)
 
 # Connect to the database
 
@@ -106,7 +107,7 @@ def add_records(attr_dict_list):
 
 
 yun_db_urls_set = set()
-for d in run('select urls from crm_order_result where telecom_update_time > 1495814400 and tags is null'):
+for d in run('select urls from crm_order_result where telecom_update_time > 1496727303 and tags is null'):
     assert 'urls' in d
     for url in d['urls'].split('|'):
         if '(' in url or ')' in url:

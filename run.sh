@@ -26,6 +26,11 @@ else
     echo "Process is running abnormal."
     echo "Process numbers is: ${P_COUNT}"
     echo "maybe another run.sh is running, exit now."
+    echo "killall run.sh"
+    killall python2.6
+    killall python
+    killall python3
+    killall sh
     exit 0
 fi
 
@@ -63,7 +68,11 @@ mkdir -p ${LOG_DIR}
 # 使用获取到的页面结果，将新的URL更新进去
 python3 update_url_content.py > ${LOG_DIR}/update_${TIMESTAMP}.log 2>&1
 
+# 使用预先设置的页面内容，将获取失败的内容重新填写
 python3 update_missing_url_contents.py >  ${LOG_DIR}/missing_${TIMESTAMP}.log 2>&1
+
+# 使用自定义细分规则，从tag_id = 3 来细分标签
+python3 data_divide.py >> ${LOG_DIR}/update_${TIMESTAMP}.log 2>&1
 
 #find . -name "*.txt" -type f -size 0c|xargs -n 1 rm
 
