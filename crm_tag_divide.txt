@@ -1,13 +1,34 @@
 ====== 加盟行业标签细分 ======
+__
+**点击右侧=>的铅笔✏️图标  你可以编辑这个页面**__
 
-编辑这个页面
+指定tag_id， order_id和关键词列表（用英文逗号隔开）则 默认(from_tag_id = 3, from_order_id= 0)中的数据将被细分，并自动导入。
+from_tag_id可以修改。
+from_order_id = 0固定，不可以修改。
 
-指定tag_id， order_id和关键词列表（用英文逗号隔开）则tag_id = 3中的数据将被细分，并自动导入。
+
+字段说明:
+
+  * 必须用**英文**双引号、英文逗号、英文冒号。
+  * 用//双斜线//注释掉的部分不会执行。执行周期是每隔十分钟，在爬虫系统处理完之后执行。
+  * tag_id： 变更后的tag_id
+  * from_tag_id: 变更前的tag_id，不写默认为3
+  * origin: 选择的省份，不写默认为全国。
+  * date: 数据的日期，例如"20170611"，加不加引号均可。
+  * order_id: 分配去的订单号，可以是一个数字(0则代表不分配去具体的订单)；也可以是一个列表，如[123, 234, 345], 代表随机分配到这些订单中。
+  * limit: 每次操作的数据的最大条数的限制，如不写则没有限制。
+
 
 <code javascript>
 // 样例
-// {"tag_id": 106, "order_id": 870, "keywords": "猪排,火鸡,大象肉"}
+  // {"tag_id": 106, "order_id": 870, "keywords": "猪排,火鸡"}
 
-  //{"tag_id": 104, "order_id": 861, "keywords": "鸡排,冰淇淋"}
+  // {"tag_id": 104, "order_id": 861, "keywords": "鸡排,冰淇淋"， "date": "20170101"}
+  
+  //  {"tag_id": 104, "order_id": 861, "keywords": "鸡排,冰淇淋", "from_tag_id": 12, "origin": "shanghai,jiangsu"}
+  
+  //  {"from_tag_id": 3, "tag_id": 3, "order_id": [861, 862, 863, 864], "keywords": "鸡排,冰淇淋", "origin": "shanghai,jiangsu"}
+  
+      {"tag_id": 114,"order_id": 0,"keywords": "小吃,牛排,汉堡,火锅,蛋糕,早餐,麻辣烫,烤肉,中餐,寿司,外卖,黄焖鸡,干洗,炸鸡,奶茶,米线"}
 
 </code>

@@ -13,6 +13,7 @@ import redis
 import os
 
 bad_url_redis = redis.Redis(port= os.environ.get('REDIS_PORT') or 6019, db=2)
+bad_url_set = set([i.decode('utf-8', 'ignore') for i in bad_url_redis.keys()])
 
 # Connect to the database
 
@@ -194,5 +195,7 @@ for part in slice_list(pattern_d, 500):
 connection.commit()
 local_connection.commit()
 
-for i in yun_db_urls_set - all_url_set:
-    print(i)
+for i in yun_db_urls_set:
+    if i not in all_url_set and i not in bad_url_set:
+        if '.baidu.com/it/' not in i:
+            print(i)

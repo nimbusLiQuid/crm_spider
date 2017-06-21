@@ -19,7 +19,8 @@ SMTP_PASSWORD   = os.environ.get('SMTP_PASSWORD')
 MAILTO_LIST     = [
                   "林泉<linquan@baicdata.com>",
                   "何帅<heshuai@baicdata.com>",
-                  "董灵瑜<donglingyu@baicdata.com>"
+                  "董灵瑜<donglingyu@baicdata.com>",
+                  "郭丽洁<guolijie@baicdata.com>"
                   ]
 # MAILTO_LIST = ['linquan@baicdata.com']
 MAIL_FROM       = "林泉的自动报表<linquan@baicdata.com>"
@@ -47,9 +48,13 @@ def sendmail(from_, to_list, subject, content):
         return False
 
 
-def send_excel_result(msg):
-    sendmail(MAIL_FROM, MAILTO_LIST, '数据导入结果 %s' % time.strftime('%Y-%m-%d %H:%M:%S'), msg)
+def send_excel_result(msg, mail_title=None):
+    if not mail_title:
+        mail_title = '数据导入结果 %s' % time.strftime('%Y-%m-%d %H:%M:%S')
+    sendmail(MAIL_FROM, MAILTO_LIST, mail_title, msg)
 
 if __name__ == '__main__':
     MAILTO_LIST = ["linquan@baicdata.com"]
     sendmail(MAIL_FROM, MAILTO_LIST, '测试101', '+-------+---------------+\n| \xe6\xa0\x87\xe9\xa2\x981 |     erere     |\n+-------+---------------+\n|   1   |      232      |\n|  1213 |     223232    |\n|  dfdf | 2dfdsfds23232 |\n+-------+---------------+')
+    send_excel_result('haha')
+    send_excel_result('haha', 'test_haha')
