@@ -54,7 +54,7 @@ def send_excel_result(msg, mail_title=None):
     sendmail(MAIL_FROM, MAILTO_LIST, mail_title, msg)
 
 if __name__ == '__main__':
-    MAILTO_LIST = ["linquan@baicdata.com"]
-    sendmail(MAIL_FROM, MAILTO_LIST, '测试101', '+-------+---------------+\n| \xe6\xa0\x87\xe9\xa2\x981 |     erere     |\n+-------+---------------+\n|   1   |      232      |\n|  1213 |     223232    |\n|  dfdf | 2dfdsfds23232 |\n+-------+---------------+')
-    send_excel_result('haha')
-    send_excel_result('haha', 'test_haha')
+    MAILTO_LIST += ["liaojiashuang@baicdata.com"]
+    MAILTO_LIST += ["bc_rd@baicdata.com"]
+    MAILTO_LIST += ["rd@baicdata.com"]
+    MAILTO_LIST += ["longmiao@baicdata.com"]

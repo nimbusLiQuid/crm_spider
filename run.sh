@@ -6,10 +6,30 @@
 # crontab -l
 # 2,12,22,32,42,52 5-19 * * * source /home/linquan/.bash_profile; cd /home/linquan/workspace/crm_spider; sh run.sh  > update.log 2>&1
 
-echo "-------------------------------------------------------------------------------------"
+
+#*/5 * * * * source /home/linquan/.bash_profile; cd /home/linquan/workspace/chudian/log_system; sh get.sh; cd /home/linquan/workspace/crm_spider; sh run.sh  > run.log 2>&1
+
 source /home/linquan/.bash_profile
 export PATH=/usr/local/bin/:${PATH}
 export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+
+
+# 打印日期
+echo "-------------------------------------------------------------------------------------"
+date
+echo "-------------------------------------------------------------------------------------"
+MARK=DIRTY.mark
+
+if [ -e ${MARK} ]
+then
+    echo "something new."
+else
+    echo "There is nothing new under the sun."
+    echo "Why not upload a file first?"
+    echo "http://118.178.237.93"
+    exit 0
+fi
+
 
 ls -l `which python`
 ls -l `which python3`
@@ -82,4 +102,5 @@ rm -f ${CONTENT_DIR}/urls_content_${DELETE}*.txt
 rm -f ${LOG_DIR}/update_${DELETE}*.log
 rm -f ${LOG_DIR}/missing_${DELETE}*.log
 echo "-------------------------------------------------------------------------------------"
+rm -f ${MARK}
 echo "Finish All Task."

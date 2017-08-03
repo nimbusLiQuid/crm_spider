@@ -126,7 +126,8 @@ monkey_patch()
 
 gbk_table = {
     "m.hc360.com": '',
-    ".5588.tv": ''
+    ".5588.tv": '',
+    "m.bmlink.com": ''
 }
 
 def detect_code_via_html(url_p):
@@ -153,9 +154,10 @@ def parse_url(url):
             return 0
 
     # 检测页面编码
-    page_charset = detect_code_via_html(url)
+    # page_charset = detect_code_via_html(url)
     try:
-        page_content = r2.content.decode(page_charset, 'ignore')
+        # page_content = r2.content.decode(page_charset, 'ignore')
+        page_content = r2.text
         soup = BeautifulSoup(page_content, 'lxml')
     except:
         print('%s\t%s' % (url, 'Error-002-程序未能成功地分析页面信息'))
@@ -237,11 +239,11 @@ def main_process_handler():
     process_queue = queue.Queue()
     # 将分配得到的url灌入本地的队列中
     while True:
+        if url_queue.empty():
+            break
         url = url_queue.get(True)
         process_queue.put(url)
         # 如果公共队列为空，则停止获取
-        if url_queue.empty():
-            break
 
     # 转入本地多线程执行
     threads = []
@@ -301,6 +303,7 @@ if __name__ == '__main__':
             url_queue.put(line)
 
     # 打开进程池，开始处理队列中的url
-    with terminating(Pool(processes=PROCESS_NUM)) as p:
-        p.apply(main_process_handler)
+    if not url_queue.empty():
+        with terminating(Pool(processes=PROCESS_NUM)) as p:
+            p.apply(main_process_handler)
 
