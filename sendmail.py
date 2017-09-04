@@ -20,7 +20,9 @@ MAILTO_LIST     = [
                   "林泉<linquan@baicdata.com>",
                   "何帅<heshuai@baicdata.com>",
                   "董灵瑜<donglingyu@baicdata.com>",
-                  "郭丽洁<guolijie@baicdata.com>"
+                  "郭丽杰<guolijie@baicdata.com>",
+                  "周露<zhoulu@baicdata.com>",
+                  "梁宵琦<liangxiaoqi@baicdata.com>"
                   ]
 # MAILTO_LIST = ['linquan@baicdata.com']
 MAIL_FROM       = "林泉的自动报表<linquan@baicdata.com>"

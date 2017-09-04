@@ -41,7 +41,7 @@ def run(sql):
         return
     affected_rows = cursor.execute(sql)
     data = cursor.fetchall()
-    sys.stderr.write('==> %d rows affected.\n' % affected_rows)
+    sys.stderr.write('crm: ==> %d rows.\n' % affected_rows)
     #print(data)
     return data
 
@@ -52,7 +52,7 @@ def lrun(sql):
     #print('----', sql, '-----')
     affected_rows = local_cursor.execute(sql)
     data = local_cursor.fetchall()
-    sys.stderr.write('==> %d rows affected.\n' % affected_rows)
+    sys.stderr.write('spider: ==> %d rows.\n' % affected_rows)
     #print(data)
     return data
 
@@ -83,11 +83,11 @@ with open('../py_spider/all.txt', errors='ignore') as f:
 """
 
 pattern_d = {}
-for m_dict in lrun('select url, title, keyword, tokens from crm_website where tag_id = 3'):
+for m_dict in lrun('select url, title, keyword from crm_website where tag_id = 3'):
     url = m_dict['url']
-    # pattern_d[url] = m_dict['title'] + m_dict['keyword'] + m_dict['tokens']
     if 'Error' in m_dict['title']:
         continue
+    # pattern_d[url] = m_dict['title'] + m_dict['keyword'] + m_dict['tokens']
     pattern_d[url] = m_dict['title'] + m_dict['keyword']
 
 def is_html_content_valid(page_content):
@@ -99,24 +99,12 @@ def is_html_content_valid(page_content):
         return True
 
 
-dly_pattern_d = {
-    u"肉蟹煲": 83,
-    u"米线": 83,
-    u"冰激凌": 90,
-    u"冰淇淋": 90,
-    u"冒菜": 90,
-    u"串串": 90,
-    u"麻辣烫": 90
-}
-
-dly_province_d = {
-    90: 'jiangsu,zhejiang,shandong,henan,anhui,shanghai'
-}
-
 NOW = int(time.time())
 total_update_count = 0
 rubbish_count = 0
-for d in run('select id, tag_id, keywords, urls, urls_content, data_description, feedback, origin from crm_order_result where telecom_update_time > 1495036851 and tags is null and feedback = 0'):
+# 只处理12个小时以内的记录
+start_timestamp = int(time.time()) - 60*60*12
+for d in run('select id, tag_id, keywords, urls, urls_content, data_description from crm_order_result where telecom_update_time > {0} and tags is null and feedback = 0'.format(start_timestamp)):
     #url_id_parts = d['data_description'].split('|')
     content_list = []
     for url in d['urls'].split('|'):
@@ -162,24 +150,6 @@ for d in run('select id, tag_id, keywords, urls, urls_content, data_description,
         run('update crm_order_result set tags = %d , urls_content = "%s" where id = %d' % (NOW, content_list, d['id']))
         total_update_count += 1
 
-    # 董灵瑜需求
-    continue
-    if content_list or keywords:
-        for key_token, new_tag_id in dly_pattern_d.items():
-            if new_tag_id in dly_province_d:
-                province_list = dly_province_d[new_tag_id]
-                if d['origin'] in province_list:
-                    if keywords and key_token in d['keywords']:
-                        if content_list and key_token in d['urls_content']:
-                            run('update crm_order_result set tag_id = %d  where id = %d' % (new_tag_id, d['id']))
-                            total_update_count += 1
-                            break
-            else:
-                if keywords and key_token in d['keywords']:
-                    if content_list and key_token in d['urls_content']:
-                        run('update crm_order_result set tag_id = %d  where id = %d' % (new_tag_id, d['id']))
-                        total_update_count += 1
-                        break
 
 connection.commit()
 
@@ -193,3 +163,4 @@ if total_update_count >= 10 or rubbish_count >= 10:
     x.add_row([total_update_count - rubbish_count, rubbish_count])
     send_excel_result(str(x))
 
+connection.close()

@@ -12,6 +12,11 @@ from url_utility import *
 import redis
 import os
 
+try:
+    TAG_ID = int(sys.argv[1])
+except IndexError:
+    TAG_ID = 3
+
 bad_url_redis = redis.Redis(port= os.environ.get('REDIS_PORT') or 6019, db=2)
 bad_url_set = set([i.decode('utf-8', 'ignore') for i in bad_url_redis.keys()])
 
@@ -38,7 +43,7 @@ local_connection = pymysql.connect(host='localhost',
 local_cursor = local_connection.cursor()
 
 def run(sql):
-    #print('----', sql, '-----')
+    # print('----', sql, '-----')
     if not sql:
         return
     affected_rows = cursor.execute(sql)
@@ -108,11 +113,10 @@ def add_records(attr_dict_list):
 
 
 yun_db_urls_set = set()
-for d in run('select urls from crm_order_result where telecom_update_time > 1496727303 and tags is null'):
+start_timestamp = int(time.time()) - 15*60
+for d in run('select urls from crm_order_result where telecom_update_time > {0} and tags is null'.format(start_timestamp)):
     assert 'urls' in d
     for url in d['urls'].split('|'):
-        if '(' in url or ')' in url:
-            continue
         if 'host.' in url[:8] and '-' in url[:8]:
             try:
                 prefix_id, correnct_url = url.split('-', 1)
@@ -166,7 +170,7 @@ for filename in glob.glob('urls_content/urls_content_*.txt'):
                 'title': title.replace('\'', ''),
                 'keyword': keywords.replace('\'', ''),
                 'tokens': ','.join(analyse.extract_tags(description + plist+ alist)).replace('\'', ''),
-                'tag_id': 3,
+                'tag_id': TAG_ID,
                 'crawled': 1
             }
             pattern_d.append(m_dict)
@@ -199,3 +203,7 @@ for i in yun_db_urls_set:
     if i not in all_url_set and i not in bad_url_set:
         if '.baidu.com/it/' not in i:
             print(i)
+
+
+connection.close()
+local_connection.close()

@@ -14,6 +14,13 @@ import Queue as queue
 from contextlib import contextmanager
 import os.path
 import signal
+import load_search_db
+import warnings  
+from fake_useragent import UserAgent
+
+# 忽略警告
+warnings.filterwarnings("ignore") 
+
 # ------------------------------
 #  ______   ______  ______   ______  _____  _____    ______  ______
 # | |  | \ | |     / |      | |  | \  | |  | | \ \  | |     | |  | \
@@ -38,7 +45,9 @@ sudo yum install libxml2 libxml2-devel libxml2-python libxslt libxslt-devel
 sudo pip install lxml
 sudo pip install cryptography
 sudo pip install urllib3[secure]
+pip install fake-useragent
 """
+
 
 # 可高效利用网络IO爬取页面信息
 # 输入参数1： 装载URL列表的文件，一行一个， 可带http://也可不带
@@ -54,19 +63,12 @@ PROCESS_NUM = 4
 # 线程数: 推荐20左右
 thread_count = 20
 # timeout 设置，5秒
-time_out = 7
+time_out = 5
 # -------------------------------
-current_path = os.path.split(os.path.realpath(__file__))[0] + '/'
-ua_list = []
-with open(current_path+'ua.list') as f:
-    for line in f:
-        line = line.strip()
-        ua_list.append(line)
 
-
-
+# fake_useragent从某网站获取最新的ua数据，并将其缓存到/tmp/目录下
+fake_ua = UserAgent()
 # ------------------- functions ---------------------------
-
 
 def get_encoding_from_headers(headers):
     """Returns encodings from given HTTP Header Dict.
@@ -121,24 +123,12 @@ def monkey_patch():
             self._content = _content
         return _content
     requests.models.Response.content = property(content)
-monkey_patch()
+# monkey_patch()
 
-
-gbk_table = {
-    "m.hc360.com": '',
-    ".5588.tv": '',
-    "m.bmlink.com": ''
-}
-
-def detect_code_via_html(url_p):
-    for url_pattern in gbk_table:
-        if url_pattern in url_p:
-            return 'gbk'
-    return 'utf-8'
 
 def parse_url(url):
     normal_https_flag = False
-    headers = {'User-Agent': random.choice(ua_list)}
+    headers = {'User-Agent': fake_ua.random}
     try:
         r2 = requests.get(url=url, headers=headers, timeout=time_out)
     except:
@@ -153,18 +143,44 @@ def parse_url(url):
             print('%s\t%s' % (url, 'Error-001-程序未能成功地获取页面信息'))
             return 0
 
-    # 检测页面编码
-    # page_charset = detect_code_via_html(url)
     try:
-        # page_content = r2.content.decode(page_charset, 'ignore')
-        page_content = r2.text
-        soup = BeautifulSoup(page_content, 'lxml')
+        # requests 对于中文编码的判断不是很准:通常中文网页不是utf-8就是gbk，在这里做简单的判断
+        # 1. 先假定认为是utf-8
+        if r2.encoding.lower() not in ['utf-8', 'gb2312', 'gbk']:
+            r2.encoding = 'utf-8'
+        # 2. 如果页面上直接就有gb2312, 那么就是gbk了
+        for line in r2.text.split('\n')[:30]:
+            line = line.lower()
+            if 'meta' in line:
+                if 'gb2312' in line:
+                    r2.encoding = 'gbk'
+                    break
+        # print r2.encoding
+        soup = BeautifulSoup(r2.text, 'lxml')
     except:
         print('%s\t%s' % (url, 'Error-002-程序未能成功地分析页面信息'))
         return 0
 
     try:
         title = soup.title.string
+        good_cnt = 0
+        bad_cnt = 0
+        # 如果标题中有这个字符，那么认为是这种情况: 本来是gb2312的网页，被错误的轨道了utf-8编码下，因此需要重新编码
+        for charactor in title:
+            # 忽略英文和符号字符
+            if charactor.lower() in u"\r \nabcdefghijklmnopqrstuvwxyz0123456789,.<>!@#$%^&*()[]{}-=+_|/\\~。，【】——（）":
+                continue
+            # 如果是3500常用字系列的，则认为是正确编码
+            if charactor in load_search_db.cn_lib_str:
+                good_cnt += 1
+            # 否则认为是错误编码
+            else:
+                bad_cnt += 1
+        # 如果错误多，认为是未明确声明的gbk编码
+        if good_cnt < bad_cnt:
+            r2.encoding = 'gbk'
+            soup = BeautifulSoup(r2.text, 'lxml')
+            title = soup.title.string
     except AttributeError:
         print('%s\t%s' % (url, 'Error-003-该页面没有标题'))
         return 0
@@ -208,14 +224,6 @@ def parse_url(url):
         print '%s\t%s' % (url, msg_body)
     else:
         print('%s\t%s' % (url, 'Error-004-程序异常'))
-
-def thread_handler(url_params):
-    thread_urls = url_params.split('?')
-    for url in thread_urls:
-        try:
-            parse_url(url)
-        except Exception, e:
-            sys.stderr.write(str(e) + '\n')
 
 
 class SpiderThread(threading.Thread):
@@ -295,6 +303,7 @@ if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         for line in f:
             line = line.strip()
+            line = line.split(None, 1)[0]
             if not line.startswith('http://') and not line.startswith('https://'):
                 if is_https_site(line):
                     line = 'https://' + line
@@ -302,8 +311,11 @@ if __name__ == '__main__':
                     line = 'http://' + line
             url_queue.put(line)
 
+    # print url_queue.qsize()
     # 打开进程池，开始处理队列中的url
-    if not url_queue.empty():
+    if url_queue.qsize() > 0:
         with terminating(Pool(processes=PROCESS_NUM)) as p:
             p.apply(main_process_handler)
+    else:
+        pass
 
