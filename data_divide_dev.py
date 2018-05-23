@@ -14,6 +14,9 @@
     date: 数据的日期，例如“20170611”，加不加引号均可。如果不写，默认是今天。
     order_id: 分配去的订单号，可以是一个数字(0则代表不分配去具体的订单)；也可以是一个列表，如[123, 234, 345], 代表平均分配到这些订单中。
     limit: 每次操作的数据的最大条数的限制，如不写则没有限制。
+
+update history
+2018-05-10 对接新的报表系统
 """
 
 import pymysql.cursors
@@ -123,13 +126,24 @@ def activate_crm_order(order_id):
     EXECUTE_DATE = time.strftime('%Y%m%d')
     run('update crm_order set end_date = {0} where id = {1}'.format(EXECUTE_DATE, order_id))
 
+import_counter = {}
+def order_import_count_plus_one(order_id, one=1):
+    """
+    对接新的报表系统，将需要增加的import量暂存，稍后将加到报表中
+    """
+    global import_counter
+    try:
+        import_counter[order_id] += one
+    except KeyError:
+        import_counter[order_id] = one
+
 
 def tag_divider(new_order_id, new_tag_id, key_list, exclude_list, province_names, given_date, from_tag_id=3, limit=None):
     total_update_count = 0
     NOW = int(time.time())
 
     try:
-        DATE = sys.argv[1]
+        DATE = sys.argv[2]
     except IndexError:
         # DATE = time.strftime('%Y%m%d')
         DATE = given_date
@@ -169,6 +183,7 @@ def tag_divider(new_order_id, new_tag_id, key_list, exclude_list, province_names
     specify_new_order_id = 0
     # 之所以要遍历结果，而不是直接用id in ，是因为可能给不同的id分配不同的order_id
     for m_dict in run(SQL):
+        # 如果是列表，则依次均匀分配
         if isinstance(new_order_id, list):
             # random distribute:
             # specify_new_order_id = choice(new_order_id)
@@ -184,11 +199,13 @@ def tag_divider(new_order_id, new_tag_id, key_list, exclude_list, province_names
                 run('update crm_order_result set order_id = {0},  tag_id = {1}  where id = {2}'.format(specify_new_order_id, new_tag_id,  m_dict['id']), simulate=False)
             else:
                 run('update crm_order_result set order_id = {0},  tag_id = {1}, update_order_data_time = {2} where id = {3}'.format(specify_new_order_id, new_tag_id, NOW,  m_dict['id']), simulate=False)
+                order_import_count_plus_one(specify_new_order_id)
         else:
             if specify_new_order_id == 0:
                 run('update crm_order_result set order_id = {0} where id = {1}'.format(specify_new_order_id,  m_dict['id']), simulate=False)
             else:
                 run('update crm_order_result set order_id = {0}, update_order_data_time = {1} where id = {2}'.format(specify_new_order_id, NOW, m_dict['id']), simulate=False)
+                order_import_count_plus_one(specify_new_order_id)
         total_update_count += 1
         # TODO 针对不同的order_id，计算不同的导入量，记到CrmOrderStat表中
 
@@ -225,6 +242,15 @@ def tag_divider(new_order_id, new_tag_id, key_list, exclude_list, province_names
         email_rule_result_list.append(mail_msg_content)
 
 
+def update_order_stat_table():
+    global import_counter
+    import_counter['key'] = 'crm_data'
+    import_counter['auth'] = '8ddd95c5f5885902219feacde84abd77'
+    response = requests.post("http://crm.vm1.cn/crm/addImport", data=import_counter)
+    print(response.text)
+    import_counter.clear()
+
+
 if __name__ == '__main__':
     # 读入董在wiki上的文件；
     # {"tag_id": 106, "order_id": 870, "keywords": "猪排,火鸡,大象"}
@@ -236,7 +262,12 @@ if __name__ == '__main__':
     print('工作目录: {0}'.format(realpath))
     current_job_line = ''
     current_job_index = 0
-    with open('/var/www/html/bcwiki/data/pages/crm/crm_tag_divide.txt', encoding='utf-8') as f:
+    try:
+        recipe_filename = sys.argv[1]
+    except IndexError:
+        recipe_filename = '/var/www/html/bcwiki/data/pages/crm/crm_tag_divide.txt'
+
+    with open(recipe_filename, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             # 提取文本中的任务行的信息到m_dict中存储 ast.literal_eval 比json.loads语法兼容性好
@@ -306,6 +337,11 @@ if __name__ == '__main__':
                         from_tag_id = m_dict['from_tag_id'],
                         limit = limit)
 
+    # 报表系统更新
+    if import_counter:
+        update_order_stat_table()
+
     # 邮件通知
     if email_rule_result_list:
         send_excel_result('\n'.join(email_rule_result_list), u'[结果通知] 加盟行业标签细分 ✂️')
+

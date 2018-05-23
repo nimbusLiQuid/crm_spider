@@ -25,7 +25,7 @@ cursor = connection.cursor()
 
 local_connection = pymysql.connect(host='localhost',
                                    user='root',
-                                   password='meeChoo7',
+                                   password='cout<<A7Sm6eqitslue5M8',
                                    db='crm_website',
                                    port=3306,
                                    charset='utf8',
@@ -76,16 +76,23 @@ with open('../py_spider/all.txt', errors='ignore') as f:
         except ValueError:
             continue
 
-        url = url.lstrip('http://')
-        url = url.lstrip('https://')
 """
+
+
+
+def spider_url_to_dpi_url(url):
+    if url.startswith('http://'):
+        url = url[7:]
+    elif url.startswith('https://'):
+        url = url[8:]
+    return url
 
 ref_d = {}
 
 with open('ref.txt') as f:
     for line in f:
         line = line.strip()
-        line = line.lstrip('http://').lstrip('https://')
+        line = spider_url_to_dpi_url(line)
         try:
             url, code_id, rest = line.split(None, 2)
         except ValueError:

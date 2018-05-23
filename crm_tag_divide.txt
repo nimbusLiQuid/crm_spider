@@ -15,15 +15,20 @@ from_order_id = 0固定，不可以修改。
 用双斜线注释掉的部分不会执行。执行周期是每隔十分钟，在爬虫系统处理完之后执行。
 
 字段说明:
-  * tag_id: 变更后的tag_id
-  * from_tag_id: 变更前的tag_id，不写默认为3. 可以是一个数字,也可以是一个列表，如[3, 100]，代表同时从这个列表中的tag_id执行.
+  * from_tag_id: 变更前的tag_id，必须提供. 可以是一个数字,也可以是一个列表，如[3, 100]，代表同时从这个列表中的tag_id执行.
+  * tag_id: 变更后的tag_id, 如果不填，则不改变
+  * <del>无此字段from_order_id:</del>  程序只可以操作order_id = 0 零号仓库中的数据。
+  * order_id: 分配去的订单号，可以是一个数字(0则代表不分配去具体的订单)；也可以是一个列表，如[123, 234, 345], 代表平均分配到这些订单中。
   * keywords: 页面和正文中包括的单词，多个用英文逗号隔开
   * exclude: 页面和正文中排除的单词，多个用英文逗号隔开
   * origin: 选择的省份，不写默认为全国。
-  * date: 数据的日期，例如"20170611"，加不加引号均可。如果不写，默认是今天。
-  * order_id: 分配去的订单号，可以是一个数字(0则代表不分配去具体的订单)；也可以是一个列表，如[123, 234, 345], 代表平均分配到这些订单中。
+  * date: 数据的入库日期，例如"20170611"，加不加引号均可。如果不写，默认是今天。
   * limit: 每次操作的数据的最大条数的限制，如不写则没有限制。
 
+
+填写说明:
+  * 请不要使用中文标点符号，请注意语法着色。
+  * 请不要使用可能导致条件循环的规则。
 
 <code javascript>
 // 样例
@@ -35,38 +40,735 @@ from_order_id = 0固定，不可以修改。
   
  //  {"from_tag_id": 3, "tag_id": 3, "order_id": [861, 862, 863, 864], "keywords": "鸡排,冰淇淋", "origin": "shanghai,jiangsu"}
      
- //  {"tag_id": 114,"order_id": 0,"keywords": "特色小吃,小吃,牛排,汉堡,火锅,重庆火锅,老火锅,鸡排,炸鸡,烘焙,蛋糕,蒸菜,包子,早餐,重庆小面,,面条,热干面,冰淇淋,牛蛙火锅,鱼粉,五谷鱼粉,干洗,干洗加盟,,赛维干洗加盟,教育,奶茶,甜品,饮品,烤鱼,烧烤,冒菜,米线,麻辣烫,外卖,寿司,烤肉拌饭,面条,小龙虾,花甲,快餐,西式快餐,中餐,私人影院,定制影院,儿童乐园,童装,化妆品,,教育培训,汽车美容,加盟连锁,鸡公煲,大盘鸡,黄焖鸡,五谷杂粮,家政,汽车快修,钵钵鸡,快餐,烤肉,韩式烤肉,口水鸡,小吃,干洗,火锅,汉堡,饮品,奶茶,冒菜,蒸菜,包子,面条,外卖,鱼粉,,西点,西点加盟,蛋糕,烘焙,墙纸,墙衣,硅藻泥,艺术涂料,艺术壁材,液体壁纸,干洗加盟连锁,花雕鸡,西点连锁加盟,眼视力,视力,眼镜,视力保健,智能家居,家居,儿童乐园,儿童游乐,婴儿游泳馆,蒸菜,喜茶,贡茶","exclude": "养生,美容,电子烟,电动车","from_tag_id": [3,100]}
-       
- //  {"tag_id": 123,"order_id": 0,"keywords": "一点点","from_tag_id": 167}
-       
- //  {"tag_id": 118,"order_id": 0,"keywords": "中式快餐,大食堂,大饭堂","exclude": "田老师,谷连天,一卤蒸鲜,烤,便当,蒸,小城故事,台湾,粥,盖浇,馄饨,永和豆浆,李先生,永和大王,吉野家,红烧肉,粥铺,肉饼,和合谷,牛肉面,八宝粥,蒸美味","from_tag_id": [3, 100]}
-       
- //  {"tag_id": 3,"order_id": 0,"keywords": "水果,今麦郎","from_tag_id": 123}
+ //  {"tag_id": 123,"keywords": "一点点","from_tag_id": 16}
      
- //  {"tag_id": 101,"order_id": 0,"keywords": "火锅","from_tag_id": 90}
+ //  {"tag_id": 110,"keywords": "鸡排","from_tag_id": 99}
      
- //  {"tag_id": 16,"order_id": 0,"keywords": "coco,都可,皇茶,喜茶,贡茶,奉茶,古茗","from_tag_id": 167}
-     
-     {"tag_id": 123,"order_id": 0,"keywords": "一点点,coco","from_tag_id": 16,}
-     
- //  {"tag_id": 188,"order_id": 0,"origin": "zhejiang","from_tag_id": 139}
-     
- //  {"tag_id": 114,"order_id": 0,"origin": "zhejiang,jiangsu,shanghai,anhui","from_tag_id": 126}
-     
- //  {"tag_id": 146,"order_id": 0,"keywords": "面","from_tag_id": 100}
-       
- //  {"tag_id": 123,"order_id": 0,"keywords": "绵绵冰，奶茶","exclude": "一点点","from_tag_id": [3,100]}
-       
- //  {"tag_id": 126,"order_id": 0,"keywords": "冒菜","汉堡","炸鸡","麻辣烫","麻辣香锅","鸡排","from_tag_id": [3, 100]}
-     
- //  {"tag_id": 137,"order_id": 0,"keywords": "面馆","擀面郎","渝味重庆小面","一品江南","王家老太","庐百味","麦弄","馋师兄","魏王面","面条","烩面","拌面","炸酱面","刀削面","盖面","牛肉面","拉面","from_tag_id": [3,100]}
-     
- //  {"tag_id": 136,"order_id": 0,"keywords": "奶茶","饮品","果汁","酸奶","炒酸奶","手工冰棍","宾果时光","欢乐柠檬","冰淇淋","冰沙","刨冰","烤鱼","便当","from_tag_id": [3,100,110]}
+ //  {"tag_id": 51,"origin": "zhejiang","from_tag_id": 47}
 
- //  {"tag_id": 123,"order_id": 0,"keywords": "奶茶","origin": "anhui,henan,hebei,jiangsu,zhejiang,shandong,hubei","from_tag_id": 90}
 
-     {"tag_id": 119,"order_id": 0,"keywords": "小学英语,小学教育,英语培训班","from_tag_id": 76}
+// 周露客户分配数据
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     {"tag_id": 809,"order_id": 2623,"from_tag_id": 809}
+
+     {"tag_id": 810,"order_id": 2624,"from_tag_id": 810}
+
+     {"tag_id": 811,"order_id": 2625,"from_tag_id": 811}
+     
+     {"tag_id": 812,"order_id": 2626,"from_tag_id": 812}
+     
+     {"tag_id": 796,"order_id": 2591,"from_tag_id": 796}
+     
+     {"tag_id": 783,"order_id": 2575,"from_tag_id": 783}
+
+     {"tag_id": 766,"order_id": 2567,"from_tag_id": 766}
+     
+     {"tag_id": 767,"order_id": 2568,"from_tag_id": 767}
+     
+     {"tag_id": 765,"order_id": 2269,"from_tag_id": 765}
+
+     {"tag_id": 381,"order_id": 1873,"from_tag_id": 381}
+
+     {"tag_id": 760,"order_id": 2560,"from_tag_id": 760}
+
+     {"tag_id": 761,"order_id": 2561,"from_tag_id": 761}
+
+     {"tag_id": 762,"order_id": 2562,"from_tag_id": 762}
+
+     {"tag_id": 763,"order_id": 2563,"from_tag_id": 763}
+
+     {"tag_id": 758,"order_id": 2557,"from_tag_id": 758}
+
+     {"tag_id": 759,"order_id": 2515,"from_tag_id": 759}
+
+     {"tag_id": 753,"order_id": [2534,2533,2532,2531,2530,2529,2528,2527,2526,2525,2524,2523],"from_tag_id": 753}
+
+     {"tag_id": 745,"order_id": 2514,"from_tag_id": 745}
+
+     {"tag_id": 737,"order_id": 2513,"from_tag_id": 737}
+
+     {"tag_id": 732,"order_id": 2508,"from_tag_id": 732}
+     
+     {"tag_id": 733,"order_id": 2509,"from_tag_id": 733}
+
+     {"tag_id": 724,"order_id": 2501,"from_tag_id": 724}
+     
+     {"tag_id": 723,"order_id": 2500,"from_tag_id": 723}
+
+     {"tag_id": 722,"order_id": 2499,"from_tag_id": 722}
+
+     {"tag_id": 717,"order_id": 2472,"from_tag_id": 717}
+
+     {"tag_id": 556,"order_id": 1457,"from_tag_id": 556}
+
+     {"tag_id": 557,"order_id": 1412,"from_tag_id": 557}
+
+     {"tag_id": 710,"order_id": 2466,"from_tag_id": 710}
+
+     {"tag_id": 665,"order_id": 2157,"from_tag_id": 665}
+
+     {"tag_id": 702,"order_id": 2454,"from_tag_id": 702}
+
+     {"tag_id": 701,"order_id": 2446,"from_tag_id": 701}
+
+     {"tag_id": 679,"order_id": 2426,"from_tag_id": 679}
+
+     {"tag_id": 678,"order_id": 2425,"from_tag_id": 678}
+     
+     {"tag_id": 21,"order_id": 2419,"from_tag_id": 21}
+      
+     //{"tag_id": 672,"origin": "chongqing","from_tag_id": 346}
+
+     {"tag_id": 662,"order_id": 2392,"from_tag_id": 662}
+
+     {"tag_id": 660,"order_id": 2390,"from_tag_id": 660}
+
+     {"tag_id": 654,"order_id": 2386,"from_tag_id": 654}
+
+     {"tag_id": 652,"order_id": 2384,"from_tag_id": 652}
+     
+     {"tag_id": 642,"order_id": 2359,"from_tag_id": 642}
+
+     {"tag_id": 640,"order_id": 2357,"from_tag_id": 640}
+
+     {"tag_id": 631,"order_id": 2352,"from_tag_id": 631}
+
+     {"tag_id": 616,"order_id": 2334,"from_tag_id": 616}
+     
+     {"tag_id": 614,"order_id": 2333,"from_tag_id": 614}
+     
+     {"tag_id": 613,"order_id": 2332,"from_tag_id": 613}
+     
+     {"tag_id": 612,"order_id": 2331,"from_tag_id": 612}
+     
+     {"tag_id": 608,"order_id": 2322,"from_tag_id": 608}
+     
+     {"tag_id": 604,"order_id": 2311,"from_tag_id": 604}
+
+     {"tag_id": 603,"order_id": 2310,"from_tag_id": 603}
+
+     {"tag_id": 593,"order_id": [2281,2282],"from_tag_id": 593}
+
+     {"tag_id": 590,"order_id": 2274,"from_tag_id": 590}
+
+     {"tag_id": 589,"order_id": 2355,"from_tag_id": 589}
+     
+     {"tag_id": 583,"order_id": [2264,2266],"from_tag_id": 583}
+     
+     {"tag_id": 582,"order_id": [2263,2265],"from_tag_id": 582}
+
+     {"tag_id": 577,"order_id": 2160,"from_tag_id": 577}
+
+     {"tag_id": 576,"order_id": 2260,"from_tag_id": 576}
+
+     {"tag_id": 575,"order_id": 2259,"from_tag_id": 575}
+
+     {"tag_id": 567,"order_id": 2227,"from_tag_id": 567}
+
+     {"tag_id": 573,"order_id": [2534,2533,2532,2531,2530,2529,2528,2527,2526,2525,2524,2523],"from_tag_id": 573}
+
+     {"tag_id": 552,"order_id": 2190,"from_tag_id": 552}
+     
+     {"tag_id": 547,"order_id": 2176,"from_tag_id": 547}
+
+     {"tag_id": 539,"order_id": 2159,"from_tag_id": 539}
+
+     {"tag_id": 538,"order_id": 1983,"from_tag_id": 538}
+
+     {"tag_id": 537,"order_id": 2161,"from_tag_id": 537}
+
+     {"tag_id": 536,"order_id": 2162,"from_tag_id": 536}
+
+     {"tag_id": 535,"order_id": 2163,"from_tag_id": 535}
+
+     {"tag_id": 534,"order_id": 2164,"from_tag_id": 534}
+     
+     {"tag_id": 530,"order_id": 2153,"from_tag_id": 530}
+     
+     {"tag_id": 523,"order_id": 2142,"from_tag_id": 523}
+
+     {"tag_id": 520,"order_id": 2139,"from_tag_id": 520}
+     
+     {"tag_id": 519,"order_id": 2138,"from_tag_id": 519}
+
+     {"tag_id": 518,"order_id": 2110,"from_tag_id": 518}
+
+     {"tag_id": 510,"order_id": [2134,2135],"from_tag_id": 510}
+     
+     {"tag_id": 501,"order_id": 2100,"from_tag_id": 501}
+     
+     {"tag_id": 481,"order_id": 2084,"from_tag_id": 481}
+     
+     //{"tag_id": 468,"order_id": [2052,2053,2054,2055,2056,2057,2058,2059],"from_tag_id": 468}
+
+     //{"tag_id": 456,"order_id": [2025,2026,2027,2028,2029,2030,2031,2032],"from_tag_id": 456}
+     
+     //{"tag_id": 457,"order_id": [2033,2034,2035,2036,2037,2038,2039,2040],"from_tag_id": 457}
+     
+     {"tag_id": 454,"order_id": 2023,"from_tag_id": 454}
+     
+     {"tag_id": 448,"order_id": 2014,"from_tag_id": 448}
+     
+     {"tag_id": 407,"order_id": 2219,"from_tag_id": 407}
+
+     {"tag_id": 335,"order_id": [2534,2533,2532,2531,2530,2529,2528,2527,2526,2525,2524,2523],"from_tag_id": 335}
+
+     //{"tag_id": 397,"order_id": [1968,1969,1971,1972],"from_tag_id": 397}
+
+     //{"tag_id": 424,"order_id": [1927,1928,1929,1930,1931,1932,1933,1934,1935,1936],"from_tag_id": 424}
+
+     //{"tag_id": 423,"order_id": [1937,1938,1939,1940,1941,1942,1943,1944,1945,1946],"from_tag_id": 423}
+
+     //{"tag_id": 422,"order_id": [1947,1948,1949,1950,1951,1952,1953,1954,1955,1956],"from_tag_id": 422,"date": "20180420"}
+
+     //{"tag_id": 421,"order_id": [1957,1958,1959,1960,1961,1962,1963,1964,1965,1966],"from_tag_id": 421}
+     
+     {"tag_id": 418,"order_id": 2006,"from_tag_id": 418}  
+     
+     {"tag_id": 412,"order_id": 1912,"from_tag_id": 412}   
+
+     {"tag_id": 392,"order_id":[1819,1820,1821,1822,1823,1824,1825,1826,1827,1828,1829,1830,1831,1832,1833,1834,1835,1836,1837,1838,1839,1840,1841,1842,1843,1844,1845,1846,1847,1848,1849,1850,1851,1852,1853,1854],"from_tag_id": 392}
+
+     //{"tag_id": 391,"order_id":[1819,1820,1821,1822,1823,1824,1825,1826,1827,1828,1829,1830,1831,1832,1833,1834,1835,1836,1837,1838,1839,1840,1841,1842,1843,1844,1845,1846,1847,1848,1849,1850,1851,1852,1853,1854],"from_tag_id": 391}
+
+     {"tag_id": 377,"order_id": 1717,"from_tag_id": 377}
+     
+     {"tag_id": 376,"order_id": 1739,"from_tag_id": 376}
+     
+     {"tag_id": 370,"order_id":[2420,2421],"from_tag_id": 370}
+
+     {"tag_id": 355,"order_id": 1683,"from_tag_id": 355}
+
+     {"tag_id": 354,"order_id": 1681,"from_tag_id": 354}
+
+     {"tag_id": 353,"order_id": 1682,"from_tag_id": 353}
+     
+     {"tag_id": 351,"order_id": [2005,1677],"from_tag_id": 351}
+     
+     {"tag_id": 350,"order_id": 1675,"from_tag_id": 350}
+     
+     //{"tag_id": 349,"order_id": 1674,"from_tag_id": 349}
+     
+     //{"tag_id": 348,"order_id": 1673,"from_tag_id": 348}
+     
+     {"tag_id": 347,"order_id": 1672,"from_tag_id": 347}
+     
+     //{"tag_id": 346,"order_id": 1657,"from_tag_id": 346}
+     
+     {"tag_id": 342,"order_id": 2083,"from_tag_id": 342}
+     
+     {"tag_id": 341,"order_id": 1648,"from_tag_id": 341}
+     
+     {"tag_id": 337,"order_id": 1643,"from_tag_id": 337}
+     
+     {"tag_id": 330,"order_id": 1637,"from_tag_id": 330}
+     
+     {"tag_id": 326,"order_id": [1604,1610,1615,1618,1621,1624,1627,1630,1633,1636],"from_tag_id": 326}
+     
+     {"tag_id": 324,"order_id": [1591,1611,1613,1616,1619,1622,1625,1628,1631,1634],"from_tag_id": 324}
+     
+     //{"tag_id": 325,"order_id": [1603,1612,1614,1617,1620,1623,1626,1629,1632,1635],"from_tag_id": 325}
+     
+     {"tag_id": 327,"order_id": 1605,"from_tag_id": 327}
+     
+     //{"tag_id": 317,"order_id": [1593,1594,1595,1676],"from_tag_id": 317}
+     
+     {"tag_id": 314,"order_id": 1577,"from_tag_id": 314}
+     
+     {"tag_id": 312,"order_id": [1667,1668,1669,1670],"from_tag_id": 312}
+     
+     {"tag_id": 311,"order_id": 1575,"from_tag_id": 311}
+     
+     {"tag_id": 310,"order_id": 1574,"from_tag_id": 310}
+     
+     {"tag_id": 309,"order_id": 1711,"from_tag_id": 309}    
+     
+     {"tag_id": 307,"order_id": 1571,"from_tag_id": 307}
+     
+     //{"tag_id": 306,"order_id": 1569,"from_tag_id": 306}
+     
+     {"tag_id": 305,"order_id": [2534,2533,2532,2531,2530,2529,2528,2527,2526,2525,2524,2523],"from_tag_id": 305}
+     
+     {"tag_id": 304,"order_id": [1567,1566,2231,2232,2233,2234,2235,2236,2237,2240,2316,2317],"from_tag_id": 304}
+     
+     {"tag_id": 303,"order_id": [2362,2363,2364,2365,2366,2367,2368,2369,2370,2371,2372,2373],"from_tag_id": 303}
+     
+     //{"tag_id": 302,"order_id": 1565,"from_tag_id": 302}
+     
+     {"tag_id": 301,"order_id": [2534,2533,2532,2531,2530,2529,2528,2527,2526,2525,2524,2523],"from_tag_id": 301}  
+     
+     {"tag_id": 300,"order_id": 1572,"from_tag_id": 300} 
+     
+     {"tag_id": 299,"order_id": 2082,"from_tag_id": 299}
+     
+     {"tag_id": 294,"order_id": 1044,"from_tag_id": 294}
+     
+     {"tag_id": 285,"order_id": 1541,"from_tag_id": 285}
+     
+     {"tag_id": 260,"order_id": 1480,"from_tag_id": 260}
+     
+     {"tag_id": 238,"order_id": 1394,"from_tag_id": 238} 
+     
+     {"tag_id": 247,"order_id": 1364,"from_tag_id": 247}
+
+     {"tag_id": 246,"order_id": 1363,"from_tag_id": 246}
+     
+     {"tag_id": 233,"order_id":1716,"from_tag_id": 233}
+     
+     {"tag_id": 220,"order_id": 1246,"from_tag_id": 220}
+     
+     {"tag_id": 173,"order_id": 1403,"from_tag_id": 173} 
+     
+     {"tag_id": 152,"order_id": 1241,"from_tag_id": 152} 
+     
+     {"tag_id": 105,"order_id": 1652,"from_tag_id": 105}  
+     
+     {"tag_id": 84,"order_id": 1653,"from_tag_id": 84}
+     
+     {"tag_id": 36,"order_id": 1651,"from_tag_id": 36} 
+
+// 梁宵琦客户分配数据
+     
+     {"tag_id": 189,"order_id": 1056,"from_tag_id": 189}
+   
+     {"tag_id": 83,"order_id": 1281,"from_tag_id": 83}
+     
+     {"tag_id": 101,"order_id": 1389,"from_tag_id": 101}
+
+     {"tag_id": 110,"order_id": 604,"from_tag_id": 110}
+     
+ //  {"tag_id": 16,"order_id": 520,"from_tag_id": 16 ,"origin": "sichuan,chongqing,guizhou"}
+     
+     {"tag_id": 57,"order_id": 757,"from_tag_id": 57}
+     
+//   {"tag_id": 4,"order_id": [1521,1581,1582],"from_tag_id": 4}
+     
+     {"tag_id": 371,"order_id": 1694,"from_tag_id": 371}
+     
+     {"tag_id": 452,"order_id": 2020,"from_tag_id": 452}
+
+// 刘鹏客户分配数据（电信）
+     
+     {"tag_id": 802,"order_id": 2606,"from_tag_id": 802}
+     
+     {"tag_id": 801,"order_id": 2596,"from_tag_id": 801}
+     
+     {"tag_id": 794,"order_id": 2587,"from_tag_id": 794}
+     
+     {"tag_id": 793,"order_id": 2592,"from_tag_id": 793}
+     
+     {"tag_id": 787,"order_id": 2565,"from_tag_id": 787}
+     
+     {"tag_id": 786,"order_id":[2577,2578],"from_tag_id": 786}
+     
+     {"tag_id": 785,"order_id": 2580,"from_tag_id": 785}
+     
+     {"tag_id": 781,"order_id": 2555,"from_tag_id": 781}
+     
+     {"tag_id": 780,"order_id": 2537,"from_tag_id": 780}
+     
+     {"tag_id": 779,"order_id": 2553,"from_tag_id": 779}
+     
+     {"tag_id": 778,"order_id": 2554,"from_tag_id": 778}
+     
+     {"tag_id": 777,"order_id": 2566,"from_tag_id": 777}
+     
+     {"tag_id": 752,"order_id":[2341,2342],"from_tag_id": 752}
+     
+     {"tag_id": 751,"order_id": 2437,"from_tag_id": 751}
+     
+     {"tag_id": 749,"order_id": 2496,"from_tag_id": 749}
+     
+     {"tag_id": 742,"order_id": 2503,"from_tag_id": 742}
+     
+     {"tag_id": 727,"order_id": [2489,2490],"from_tag_id": 727}
+     
+     {"tag_id": 726,"order_id": 2485,"from_tag_id": 726}
+     
+     {"tag_id": 720,"order_id": 2473,"from_tag_id": 720}
+     
+     {"tag_id": 719,"order_id": [1748,1751],"from_tag_id": 719}
+     
+     {"tag_id": 712,"order_id":2422,"from_tag_id": 712}
+     
+     {"tag_id": 709,"order_id": [2451,2452,2453],"from_tag_id": 709}
+     
+     {"tag_id": 708,"order_id": [2096,2455],"from_tag_id": 708}
+     
+     {"tag_id": 700,"order_id": [2398,2441],"from_tag_id": 700}
+      
+     {"tag_id": 699,"order_id": 2440,"from_tag_id": 699}
+     
+     {"tag_id": 698,"order_id": 2439,"from_tag_id": 698}
+     
+     {"tag_id": 697,"order_id": 2430,"from_tag_id": 697}
+     
+     {"tag_id": 687,"order_id": 2405,"from_tag_id": 687}
+     
+     {"tag_id": 686,"order_id": 2434,"from_tag_id": 686}
+     
+     {"tag_id": 685,"order_id": 2433,"from_tag_id": 685}
+     
+     {"tag_id": 684,"order_id": 2432,"from_tag_id": 684}
+     
+     {"tag_id": 683,"order_id": 2429,"from_tag_id": 683}
+     
+     {"tag_id": 676,"order_id": 2404,"from_tag_id": 676}
+     
+     {"tag_id": 673,"order_id": 2410,"from_tag_id": 673}
+     
+     {"tag_id": 671,"order_id": 2408,"from_tag_id": 671}
+     
+     {"tag_id": 670,"order_id": 2399,"from_tag_id": 670}
+     
+     {"tag_id": 669,"order_id": 2400,"from_tag_id": 669}
+     
+     {"tag_id": 667,"order_id": 2397,"from_tag_id": 667}
+     
+     {"tag_id": 658,"order_id": 2375,"from_tag_id": 658}
+     
+     {"tag_id": 644,"order_id": 1911,"from_tag_id": 644}
+     
+     {"tag_id": 639,"order_id": 2339,"from_tag_id": 639}
+     
+     {"tag_id": 629,"order_id": 2336,"from_tag_id": 629}
+     
+     {"tag_id": 628,"order_id": 2335,"from_tag_id": 628}
+     
+     {"tag_id": 624,"order_id": 2326,"from_tag_id": 624}
+     
+     {"tag_id": 623,"order_id": 2324,"from_tag_id": 623}
+
+     {"tag_id": 622,"order_id": 2306,"from_tag_id": 622}
+
+     {"tag_id": 621,"order_id": 2285,"from_tag_id": 621}
+
+     {"tag_id": 620,"order_id": 2258,"from_tag_id": 620}
+
+     {"tag_id": 619,"order_id": 2323,"from_tag_id": 619}
+
+     {"tag_id": 618,"order_id": 2325,"from_tag_id": 618}
+     
+     {"tag_id": 617,"order_id": 2328,"from_tag_id": 617}
+     
+     {"tag_id": 607,"order_id": [2307,2309],"from_tag_id": 607}
+     
+     {"tag_id": 606,"order_id": 2305,"from_tag_id": 606}
+     
+     {"tag_id": 605,"order_id": 2304,"from_tag_id": 605}
+     
+     {"tag_id": 595,"order_id": 2267,"from_tag_id": 595}
+     
+     {"tag_id": 594,"order_id": [2283,2327],"from_tag_id": 594}
+     
+     {"tag_id": 592,"order_id": 2268,"from_tag_id": 592}
+     
+     {"tag_id": 591,"order_id": 2272,"from_tag_id": 591}
+     
+     {"tag_id": 588,"order_id": 2199,"from_tag_id": 588}
+     
+     {"tag_id": 587,"order_id": 2255,"from_tag_id": 587}
+     
+     {"tag_id": 586,"order_id": 2229,"from_tag_id": 586}
+     
+     {"tag_id": 585,"order_id": 2228,"from_tag_id": 585}
+     
+     {"tag_id": 584,"order_id": 2222,"from_tag_id": 584}
+
+     {"tag_id": 563,"order_id": 2113,"from_tag_id": 563}
+     
+     {"tag_id": 561,"order_id": 2196,"from_tag_id": 561}
+
+     {"tag_id": 559,"order_id": 2177,"from_tag_id": 559}
+
+     {"tag_id": 558,"order_id": 2181,"from_tag_id": 558}
+
+     {"tag_id": 550,"order_id": 2179,"from_tag_id": 550}
+
+     {"tag_id": 548,"order_id": 2172,"from_tag_id": 548}
+     
+     {"tag_id": 544,"order_id": 2147,"from_tag_id": 544}
+     
+     {"tag_id": 543,"order_id": 2170,"from_tag_id": 543}
+     
+     //{"tag_id": 542,"order_id": [2182,2183],"from_tag_id": 542}
+
+     {"tag_id": 540,"order_id": 2149,"from_tag_id": 540}
+     
+     {"tag_id": 529,"order_id": 2148,"from_tag_id": 529}
+     
+     {"tag_id": 528,"order_id": 2150,"from_tag_id": 528}
+     
+     {"tag_id": 525,"order_id": 2112,"from_tag_id": 525}
+     
+     {"tag_id": 524,"order_id": 2111,"from_tag_id": 524}
+     
+     //{"tag_id": 512,"order_id":[2116,2117,2118,2119,2120,2121,2122,2123,2124,2125,2126,2127,2128,2129,2130,2131,2132,2133],"from_tag_id": 512}
+
+     {"tag_id": 511,"order_id": 2114,"from_tag_id": 511}
+     
+     {"tag_id": 509,"order_id": [2104,2257],"from_tag_id": 509}
+     
+     {"tag_id": 504,"order_id": 2097,"from_tag_id": 504}
+
+     {"tag_id": 500,"order_id": 2095,"from_tag_id": 500}
+
+     {"tag_id": 469,"order_id": 2021,"from_tag_id": 469}
+
+     {"tag_id": 465,"order_id": 2004,"from_tag_id": 465}
+     
+     {"tag_id": 463,"order_id": 2046,"from_tag_id": 463}
+     
+     {"tag_id": 462,"order_id": 2047,"from_tag_id": 462}
+     
+     {"tag_id": 461,"order_id": 2018,"from_tag_id": 461}
+
+     {"tag_id": 458,"order_id": 2000,"from_tag_id": 458}
+
+     {"tag_id": 449,"order_id": 2003,"from_tag_id": 449}
+
+     {"tag_id": 447,"order_id": 1999,"from_tag_id": 447}
+     
+     {"tag_id": 446,"order_id": 1998,"from_tag_id": 446}
+     
+     {"tag_id": 445,"order_id": 2270,"from_tag_id": 445}
+     
+     {"tag_id": 444,"order_id": 2002,"from_tag_id": 444}
+     
+     {"tag_id": 440,"order_id": 1978,"from_tag_id": 440}
+     
+     {"tag_id": 435,"order_id": 1985,"from_tag_id": 435}
+
+     {"tag_id": 433,"order_id": 1984,"from_tag_id": 433}
+     
+     {"tag_id": 432,"order_id": 1503,"from_tag_id": 432}
+     
+     {"tag_id": 429,"order_id": 1980,"from_tag_id": 429}
+     
+     {"tag_id": 416,"order_id": 1915,"from_tag_id": 416}
+     
+     {"tag_id": 415,"order_id": [1896,2115],"from_tag_id": 415}     
+     
+     {"tag_id": 413,"order_id": 1913,"from_tag_id": 413}
+     
+     {"tag_id": 404,"order_id": 1897,"from_tag_id": 404}
+     
+     {"tag_id": 403,"order_id": 1899,"from_tag_id": 403}     
+     
+     {"tag_id": 402,"order_id": 1887,"from_tag_id": 402}               
+     
+     {"tag_id": 393,"order_id": 1732,"from_tag_id": 393}
+     
+     {"tag_id": 390,"order_id": 1886,"from_tag_id": 390}
+     
+     {"tag_id": 389,"order_id": 1885,"from_tag_id": 389}
+     
+     {"tag_id": 387,"order_id": 1883,"from_tag_id": 387}
+     
+     {"tag_id": 386,"order_id": 1882,"from_tag_id": 386}
+     
+     {"tag_id": 385,"order_id": 1881,"from_tag_id": 385}
+     
+     {"tag_id": 379,"order_id": [1742,1743],"from_tag_id": 379}
+     
+     {"tag_id": 372,"order_id": 1725,"from_tag_id": 372}
+     
+     {"tag_id": 365,"order_id": 1697,"from_tag_id": 365}
+     
+     {"tag_id": 362,"order_id": 1684,"from_tag_id": 362}
+
+     {"tag_id": 343,"order_id": [2088,2089,2090,2091,2092],"from_tag_id": 343}
+          
+     {"tag_id": 336,"order_id": 1642,"from_tag_id": 336}
+     
+     {"tag_id": 318,"order_id": 1592,"from_tag_id": 318}
+     
+     {"tag_id": 290,"order_id": 1986,"from_tag_id": 290}
+     
+     {"tag_id": 267,"order_id": 1498,"from_tag_id": 267}
+     
+     {"tag_id": 264,"order_id": 1491,"from_tag_id": 264}
+     
+     {"tag_id": 261,"order_id": 1482,"from_tag_id": 261}
+     
+     {"tag_id": 249,"order_id": [1436,1671],"from_tag_id": 249}
+     
+     {"tag_id": 236,"order_id": 1473,"from_tag_id": 236}          
+     
+     {"tag_id": 209,"order_id": [1465,1503],"from_tag_id": 209}
+     
+     //{"tag_id": 194,"order_id": [1450,1502,1527,1678,1703,1704,1705,1706,1904,1905,2166,2167],"from_tag_id": 194}
+     
+     {"tag_id": 180,"order_id": 1540,"from_tag_id": 180}
+     
+     {"tag_id": 176,"order_id": 1497,"from_tag_id": 176} 
+         
+     {"tag_id": 175,"order_id": 1243,"from_tag_id": 175} 
+     
+     {"tag_id": 129,"order_id": 1249,"from_tag_id": 129}   
+     
+     {"tag_id": 123,"order_id": 1736,"from_tag_id": 123}
+     
+     {"tag_id": 118,"order_id": 1733,"from_tag_id": 118}
+     
+     {"tag_id": 112,"order_id": 1654,"from_tag_id": 112}
+     
+     {"tag_id": 63,"order_id": 1225,"from_tag_id": 63}
+     
+     {"tag_id": 33,"order_id": 1379,"from_tag_id": 33}
+     
+     {"tag_id": 3,"order_id": 1518,"from_tag_id": 3}
+     
+// 刘鹏客户分配数据（联通）
+     
+     {"tag_id": 596,"order_id": 2221,"from_tag_id": 596}
+     
+     {"tag_id": 477,"order_id": 1891,"from_tag_id": 477}
+     
+     {"tag_id": 474,"order_id": 2066,"from_tag_id": 474}
+
+     {"tag_id": 451,"order_id": 1926,"from_tag_id": 451}
+
+     {"tag_id": 439,"order_id": 1724,"from_tag_id": 439}
+     
+     {"tag_id": 405,"order_id": 1730,"from_tag_id": 405}
+     
+     {"tag_id": 384,"order_id": 1880,"from_tag_id": 384}
+     
+     {"tag_id": 378,"order_id": 1747,"from_tag_id": 378}
+
+     {"tag_id": 338,"order_id":[1644,2607],"from_tag_id": 338}
+     
+     {"tag_id": 278,"order_id": 1696,"from_tag_id": 278}
+     
+     
+     
+// 28分配数据
+          
+     {"tag_id": 6,"order_id": 832,"from_tag_id": 6}
+ 
+     {"tag_id": 17,"order_id": 833,"from_tag_id": 17}
+ 
+     {"tag_id": 18,"order_id": 834,"from_tag_id": 18}
+ 
+     {"tag_id": 19,"order_id": 845,"from_tag_id": 19}
+ 
+     {"tag_id": 20,"order_id": 953,"from_tag_id": 20}
+ 
+     {"tag_id": 31,"order_id": 1000,"from_tag_id": 31}
+ 
+     {"tag_id": 39,"order_id": 1001,"from_tag_id": 39}
+ 
+     {"tag_id": 53,"order_id": 1002,"from_tag_id": 53}
+ 
+     {"tag_id": 64,"order_id": 1395,"from_tag_id": 64}
+ 
+     {"tag_id": 74,"order_id": 1396,"from_tag_id": 74}
+ 
+     {"tag_id": 91,"order_id": 1397,"from_tag_id": 91}
+
+     {"tag_id": 95,"order_id": 1398,"from_tag_id": 95}
+ 
+     {"tag_id": 98,"order_id": 1179,"from_tag_id": 98}
+     
+     {"tag_id": 99,"order_id": 1409,"from_tag_id": 99}
+     
+
+     
+// 董灵瑜客户分配数据
+
+//   {"tag_id": 229,"order_id": 1358,"from_tag_id": 229}
+     
+  // {"tag_id": 255,"order_id": 1446,"from_tag_id": 255}
+  
+     {"tag_id": 369,"order_id": 1989,"from_tag_id": 369}
+     
+     {"tag_id": 434,"order_id": 1988,"from_tag_id": 434}
+     
+     {"tag_id": 357,"order_id": 1679,"from_tag_id": 357}
+     
+     {"tag_id": 272,"order_id": [1511,1664,1665,1922,1923,2215,2216,2217,2218],"from_tag_id": 272}
+     
+     {"tag_id": 35,"order_id": [1707,1708,1709,1710,2015,2016,2207,2208,2209,2211,2212],"from_tag_id": 35}
+     
+     
+ // 杨柳客户分配数据   
+     {"tag_id": 130,"order_id": 968,"from_tag_id": 130}
+     
+     {"tag_id": 131,"order_id": 969,"from_tag_id": 131}
+     
+     {"tag_id": 323,"order_id": 1598,"from_tag_id": 323}
+    
+     {"tag_id": 646,"order_id": 2378,"from_tag_id": 646}
+     
+     {"tag_id": 647,"order_id": 2379,"from_tag_id": 647}
+      
+     {"tag_id": 674,"order_id": 2411,"from_tag_id": 674}
+     
+     {"tag_id": 675,"order_id": 2412,"from_tag_id": 675}
+     
+     {"tag_id": 707,"order_id": 2461,"from_tag_id": 707}
+     
+     {"tag_id": 711,"order_id": 2467,"from_tag_id": 711}
+     
+     {"tag_id": 714,"order_id": 2468,"from_tag_id": 714}
+     
+     {"tag_id": 715,"order_id": 2470,"from_tag_id": 715}
+     
+     {"tag_id": 716,"order_id": 2471,"from_tag_id": 716}
+     
+     {"tag_id": 725,"order_id": 2502,"from_tag_id": 725}
+     
+     {"tag_id": 734,"order_id": 2510,"from_tag_id": 734}
+     
+     {"tag_id": 735,"order_id": 2511,"from_tag_id": 735}
+     
+     {"tag_id": 736,"order_id": 2512,"from_tag_id": 736}
+     
+     {"tag_id": 744,"order_id": 2538,"from_tag_id": 744}
+     
+     {"tag_id": 764,"order_id": 2564,"from_tag_id": 764}
+     
+     {"tag_id": 768,"order_id": 2569,"from_tag_id": 768}
+     
+     {"tag_id": 769,"order_id": 2570,"from_tag_id": 769}
+     
+     {"tag_id": 788,"order_id": 2581,"from_tag_id": 788}
+     
+     {"tag_id": 789,"order_id": 943,"from_tag_id": 789}
+     
+     {"tag_id": 790,"order_id": 2582,"from_tag_id": 790}
+     
+     {"tag_id": 791,"order_id": 2583,"from_tag_id": 791}
+     
+     {"tag_id": 792,"order_id": 2584,"from_tag_id": 792}
+     
+     {"tag_id": 795,"order_id": 2593,"from_tag_id": 795}
+     
+     {"tag_id": 800,"order_id": 2602,"from_tag_id": 800}
+     
+     {"tag_id": 804,"order_id": 2612,"from_tag_id": 804}
 </code>
 
-<note tip>点击下面的链接立即执行一次分割</note>
-[[http://118.178.237.93/data_divide.php|✂️ 立即执行 ✂️]]
+<note tip>点击下面的链接去运营网站执行一次分割</note>
+[[https://op.vm1.cn/data_divide.php|✂️ 数据分割 ✂️]]

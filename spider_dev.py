@@ -165,7 +165,13 @@ def parse_url(url):
     normal_https_flag = False
     headers = {'User-Agent': fake_ua.random}
     try:
-        r2 = requests.get(url=url, headers=headers, timeout=time_out)
+        r2 = requests.get(url=url, headers=headers, timeout=time_out, stream=True)
+        r2.raise_for_status()
+        content_length = r2.header.get('Content-Length')
+        if not content_length:
+            content_length = 0
+        print(content_length)
+        content_length = int(content_length)
     except:
         normal_https_flag = True
 

@@ -1,0 +1,8 @@
+redis==2.10.5
+fake_useragent==0.1.7
+prettytable==0.7.2
+requests==2.14.2
+jieba==0.38
+PyMySQL==0.7.11
+beautifulsoup4==4.6.0
+psyco==1.6

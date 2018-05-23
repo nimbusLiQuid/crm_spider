@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 #! coding: utf-8
 """
-此脚本实现了根据json形式的文本列表，将order_id == 0 仓库中的数据实现了数据细分
+此脚本实现了根据json形式的文本列表，将order_id = 0 仓库中的数据实现了数据细分
 必须用英文双引号、英文逗号、英文冒号。
 用双斜线注释掉的部分不会执行。执行周期是每隔十分钟，在爬虫系统处理完之后执行。
 
@@ -22,7 +22,6 @@ import time
 import json
 import ast
 sys.path.append('.')
-import requests
 from jieba import analyse
 # Connect to the database
 from sendmail import send_excel_result
@@ -190,7 +189,6 @@ def tag_divider(new_order_id, new_tag_id, key_list, exclude_list, province_names
             else:
                 run('update crm_order_result set order_id = {0}, update_order_data_time = {1} where id = {2}'.format(specify_new_order_id, NOW, m_dict['id']), simulate=False)
         total_update_count += 1
-        # TODO 针对不同的order_id，计算不同的导入量，记到CrmOrderStat表中
 
     # add action log
     # insert into crm_action_log
@@ -236,10 +234,10 @@ if __name__ == '__main__':
     print('工作目录: {0}'.format(realpath))
     current_job_line = ''
     current_job_index = 0
-    with open('/var/www/html/bcwiki/data/pages/crm/crm_tag_divide.txt', encoding='utf-8') as f:
+    with open('/var/www/html/bcwiki/data/pages/crm/crm_tag_divide_glj.txt', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            # 提取文本中的任务行的信息到m_dict中存储 ast.literal_eval 比json.loads语法兼容性好
+            # 提取文本中的任务行的信息到m_dict中存储 ast.literal_eval 比json.loads兼容性好
             try:
                 m_dict = ast.literal_eval(line)
             except ValueError:
@@ -286,11 +284,6 @@ if __name__ == '__main__':
                 given_date_str = time.strftime('%Y%m%d')
             else:
                 given_date_str = str(m_dict['date'])
-
-            if 'telecom_update_date' not in m_dict:
-                telecom_update_date_str = time.strftime('%Y%m%d')
-            else:
-                telecom_update_date_str = str(m_dict['telecom_update_date'])
 
             if 'limit' not in m_dict:
                 limit = None
